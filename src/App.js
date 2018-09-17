@@ -7,8 +7,8 @@ class App extends Component {
     this.state = {
       username:'',
       savedUser:'',
-      clientId: '847877e968e6b2425b32',
-      clientSecret: '32d637706cb51313a99adeee981c8b6f54c381b0',
+      clientId: '*************',
+      clientSecret: '******************',
       count: 20,
       sort: 'created: asc',
       repos: [],
