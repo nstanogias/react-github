@@ -39,11 +39,11 @@ class App extends Component {
         }
       })
       .then(data => {
-          this.setState({ repos: data, username:'', success:true, requestFailed: false, count:count});
+          this.setState({ repos: data, success:true, requestFailed: false, count:count});
       })
       .catch(err => {
         console.log(err);
-        this.setState({ requestFailed: true, username:'', savedUser:'', success:false, count:20})
+        this.setState({ requestFailed: true, savedUser:'', success:false, count:20})
       });
   }
 
@@ -84,6 +84,11 @@ class App extends Component {
                   placeholder="Github Profile Username"
                   name="username"
                   onChange={this.onChange}
+                  onKeyPress={event => {
+                    if (event.key === 'Enter') {
+                      this.onClick(this.state.count)
+                    }
+                  }}
                 />
                   <div className="input-group-append">
                     <button
