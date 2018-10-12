@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import {connect} from 'react-redux';
 
 class App extends Component {
 
@@ -6,15 +7,8 @@ class App extends Component {
     super();
     this.state = {
       username:'',
-      savedUser:'',
-      clientId: '*************',
-      clientSecret: '******************',
-      count: 20,
-      sort: 'created: asc',
-      repos: [],
-      requestFailed: false,
-      success: false,
-    }
+      sort: 'created: asc'
+    };
 
     this.onChange = this.onChange.bind(this);
   }
@@ -23,53 +17,11 @@ class App extends Component {
     this.setState({username:e.target.value, savedUser:e.target.value})
   }
 
-  onClick(count) {
-    const { sort, clientId, clientSecret } = this.state;
-    fetch(
-      `https://api.github.com/users/${this.state.savedUser}/repos?per_page=${count}&sort=${sort}&client_id=${clientId}&client_secret=${clientSecret}`
-    )
-      .then((response) => {
-        if(response.status === 200) {
-         console.log("SUCCESS");
-          return response.json()
-        }
-        else if(!response.ok){
-          console.log("SOMETHING WENT WRONG");
-          throw new Error(response.status);
-        }
-      })
-      .then(data => {
-          this.setState({ repos: data, success:true, requestFailed: false, count:count});
-      })
-      .catch(err => {
-        console.log(err);
-        this.setState({ requestFailed: true, savedUser:'', success:false, count:20})
-      });
+  onClick() {
+    this.props.history.push(`/user/${this.state.username}`)
   }
 
   render() {
-
-    const{success} = this.state;
-    let repoContent = null;
-    let size = 0;
-    if(success) {
-      size = this.state.repos.length;
-      repoContent = this.state.repos.map(repo => (
-        <div key={repo.id} className="card card-body mb-2">
-          <div className="row">
-            <div className="col-md-6">
-              <h4><a href={repo.html_url} className="text-info" >{repo.name}</a></h4>
-              <p>{repo.description}</p>
-            </div>
-            <div className="col-md-6">
-              <span className="badge badge-info mr-1">Stars: {repo.stargazers_count}</span>
-              <span className="badge badge-secondary mr-1">Watchers: {repo.watchers_count}</span>
-              <span className="badge badge-success">Forks: {repo.forks_count} </span>
-            </div>
-          </div>
-        </div>
-      ))
-    }
 
     return (
         <div className="container">
@@ -86,7 +38,7 @@ class App extends Component {
                   onChange={this.onChange}
                   onKeyPress={event => {
                     if (event.key === 'Enter') {
-                      this.onClick(this.state.count)
+                      this.onClick(this.props.repos.count)
                     }
                   }}
                 />
@@ -95,7 +47,7 @@ class App extends Component {
                       className="btn btn-outline-info"
                       type="button"
                       id="button-addon2"
-                      onClick={() => this.onClick(this.state.count)}
+                      onClick={() => this.onClick(this.props.repos.count)}
                     >
                       Search
                     </button>
@@ -103,26 +55,15 @@ class App extends Component {
               </div>
             </div>
           </div>
-            {this.state.success &&
-              <div>
-                <h1 className="text-center mt-5 text-info">Latest Repositories</h1>
-                {repoContent}
-                </div>
-            }
-            {this.state.requestFailed  &&
-            <div>
-              <h1 className="text-center mt-5 text-danger">Something went wrong. Please insert a valid username.</h1>
-            </div>
-            }
-            {size > 0 && size === this.state.count ?
-              <div className="mt-5">
-                <button className="btn btn-outline-info" onClick={() => this.onClick(this.state.count+20)}>Load More</button>
-              </div>
-              :null
-            }
           </div>
     );
   }
 }
 
-export default App;
+const mapStateToProps = state => {
+  return {
+    repos: state.repos
+  };
+};
+
+export default connect(mapStateToProps, null)(App);
